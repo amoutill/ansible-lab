@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=https://github.com/datreeio/CRDs-catalog/raw/refs/heads/main/pool.kubevirt.io/virtualmachinepool_v1alpha1.json
+apiVersion: pool.kubevirt.io/v1alpha1
+kind: VirtualMachinePool
+metadata:
+  name: opensuse-leap
+  namespace: ansible-lab
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      kubevirt.io/vmpool: opensuse-leap
+  virtualMachineTemplate:
+    metadata:
+      labels:
+        kubevirt.io/vmpool: opensuse-leap
+    spec:
+      runStrategy: Always
+      instancetype:
+        name: u1.2xmedium
+        kind: virtualMachineClusterInstancetype
+      preference:
+        name: opensuse.leap
+        kind: virtualMachineClusterPreferences
+      template:
+        metadata:
+          labels:
+            kubevirt.io/vmpool: opensuse-leap
+        spec:
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+              labelSelector:
+                matchLabels:
+                  kubevirt.io/vmpool: opensuse-leap
+          domain:
+            devices:
+              disks:
+                - name: rootdisk
+                  disk:
+                    bus: virtio
+          volumes:
+            - name: rootdisk
+              dataVolume:
+                name: rootdisk
+            - name: cloudinitdisk
+              cloudInitNoCloud:
+                userData: |
+                  #cloud-config
+                  users:
+                    - name: opensuse
+                      sudo: ALL=(ALL) NOPASSWD:ALL
+                      ssh_authorized_keys:
+                        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID1SYyLecS2vZgHClsxjMIF9R895CepgDg1Y1aJklOoe openpgp:0x453A8058
+                  chpasswd:
+                    list: |
+                      opensuse:opensuse
+                    expire: False
+      dataVolumeTemplates:
+        - metadata:
+            name: rootdisk
+          spec:
+            storage:
+              resources:
+                requests:
+                  storage: 16Gi
+              storageClassName: ceph-blockpool
+              accessModes:
+                - ReadWriteOnce
+              volumeMode: Filesystem
+            source:
+              http:
+                url: https://download.opensuse.org/distribution/leap/16.0/appliances/Leap-16.0-Minimal-VM.aarch64-Cloud.qcow2

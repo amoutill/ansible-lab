@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensuse-leap-0
+  namespace: ansible-lab
+  annotations:
+    tailscale.com/proxy-group: ufp-ingress
+    tailscale.com/hostname: opensuse-leap-0
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  selector:
+    vm.kubevirt.io/name: opensuse-leap-0
+  ports:
+    - name: ssh
+      port: 22
+      protocol: TCP
+      targetPort: 22
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensuse-leap-1
+  namespace: ansible-lab
+  annotations:
+    tailscale.com/proxy-group: ufp-ingress
+    tailscale.com/hostname: opensuse-leap-1
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  selector:
+    vm.kubevirt.io/name: opensuse-leap-1
+  ports:
+    - name: ssh
+      port: 22
+      protocol: TCP
+      targetPort: 22
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opensuse-leap-2
+  namespace: ansible-lab
+  annotations:
+    tailscale.com/proxy-group: ufp-ingress
+    tailscale.com/hostname: opensuse-leap-2
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  selector:
+    vm.kubevirt.io/name: opensuse-leap-2
+  ports:
+    - name: ssh
+      port: 22
+      protocol: TCP
+      targetPort: 22
