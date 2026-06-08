@@ -33,12 +33,18 @@ spec:
               labelSelector:
                 matchLabels:
                   kubevirt.io/vmpool: opensuse-leap
+          readinessProbe:
+            tcpSocket:
+              port: 6443
           domain:
             devices:
               disks:
                 - name: rootdisk
                   disk:
                     bus: virtio
+              interfaces:
+                - name: default
+                  masquerade: {}
           volumes:
             - name: rootdisk
               dataVolume:
@@ -56,6 +62,9 @@ spec:
                     list: |
                       opensuse:opensuse
                     expire: False
+          networks:
+            - name: default
+              pod: {}
       dataVolumeTemplates:
         - metadata:
             name: rootdisk

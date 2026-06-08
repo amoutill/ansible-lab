@@ -16,6 +16,7 @@ spec:
       port: 22
       protocol: TCP
       targetPort: 22
+  publishNotReadyAddresses: true
 ---
 apiVersion: v1
 kind: Service
@@ -35,6 +36,7 @@ spec:
       port: 22
       protocol: TCP
       targetPort: 22
+  publishNotReadyAddresses: true
 ---
 apiVersion: v1
 kind: Service
@@ -54,3 +56,4 @@ spec:
       port: 22
       protocol: TCP
       targetPort: 22
+  publishNotReadyAddresses: true
