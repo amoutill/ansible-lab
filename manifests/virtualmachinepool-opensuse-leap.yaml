@@ -44,7 +44,7 @@ spec:
                     bus: virtio
               interfaces:
                 - name: default
-                  masquerade: {}
+                  bridge: {}
           volumes:
             - name: rootdisk
               dataVolume:
