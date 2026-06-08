@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ansible-lab-rke2
+  namespace: ansible-lab
+  annotations:
+    tailscale.com/proxy-group: ufp-ingress
+    tailscale.com/hostname: ansible-lab-rke2
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  selector:
+    kubevirt.io/vmpool: opensuse-leap
+  ports:
+    - name: rke2
+      port: 9345
+      protocol: TCP
+      targetPort: 9345
+    - name: kubernetes
+      port: 6443
+      protocol: TCP
+      targetPort: 6443

@@ -4,3 +4,4 @@ resources:
   - namespace-ansible-lab.yaml
   - virtualmachinepool-opensuse-leap.yaml
   - service-opensuse-leap.yaml
+  - service-ansible-lab-rke2.yaml
