@@ -1,0 +1,96 @@
+- name: Install RKE2 on all nodes
+  hosts: ansible_lab
+
+  tasks:
+    - name: Install RKE2
+      become: true
+      ansible.builtin.shell:
+        cmd: curl -sfL https://get.rke2.io | sh -
+        creates: /usr/local/bin/rke2
+
+- name: Bootstrap RKE2 cluster
+  hosts: rke2_bootstrap_node
+
+  tasks:
+    - name: Make sure rke2 dir exists
+      become: true
+      ansible.builtin.file:
+        path: /etc/rancher/rke2
+        state: directory
+        mode: "744"
+        owner: root
+    - name: Create bootstrap config
+      become: true
+      ansible.builtin.copy:
+        dest: /etc/rancher/rke2/config.yaml
+        mode: "600"
+        owner: root
+        content: |
+          tls-san:
+            - ansible-lab-rke2
+      register: config
+    - name: Enable RKE2
+      become: true
+      ansible.builtin.service:
+        name: rke2-server
+        enabled: true
+    - name: Start RKE2
+      become: true
+      ansible.builtin.service:
+        name: rke2-server
+        state: started
+      register: service
+    - name: Restart RKE2
+      become: true
+      ansible.builtin.service:
+        name: rke2-server
+        state: restarted
+      when: not service.changed and config.changed
+
+- name: Join server nodes
+  hosts: rke2_server_nodes:!rke2_bootstrap_node
+
+  tasks:
+    - name: Load token from bootstrap node
+      delegate_to: "{{ groups['rke2_bootstrap_node'][0] }}"
+      run_once: true
+      become: true
+      ansible.builtin.slurp:
+        src: /var/lib/rancher/rke2/server/token
+      register: token
+    - name: Make sure rke2 dir exists
+      become: true
+      ansible.builtin.file:
+        path: /etc/rancher/rke2
+        state: directory
+        mode: "744"
+        owner: root
+    - name: Create server config
+      become: true
+      ansible.builtin.copy:
+        dest: /etc/rancher/rke2/config.yaml
+        mode: "600"
+        owner: root
+        content: |
+          server: https://ansible-lab-rke2:9345
+          token: {{ token['content'] | b64decode | trim }}
+          tls-san:
+            - ansible-lab-rke2
+      register: config
+    - name: Enable RKE2
+      become: true
+      ansible.builtin.service:
+        name: rke2-server
+        enabled: true
+    - name: Start RKE2
+      become: true
+      ansible.builtin.service:
+        name: rke2-server
+        state: started
+      register: service
+    - name: Restart RKE2
+      become: true
+      ansible.builtin.service:
+        name: rke2-server
+        state: restarted
+      when: not service.changed and config.changed

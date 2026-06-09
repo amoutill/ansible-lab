@@ -1,0 +1,8 @@
+- name: Uninstall RKE2 on all nodes
+  hosts: ansible_lab
+
+  tasks:
+    - name: Uninstall RKE2
+      become: true
+      ansible.builtin.shell:
+        cmd: /usr/local/bin/rke2-uninstall.sh
