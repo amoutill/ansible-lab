@@ -43,8 +43,10 @@ spec:
                   disk:
                     bus: virtio
               interfaces:
-                - name: default
+                - name: br0
                   bridge: {}
+                - name: default
+                  masquerade: {}
           volumes:
             - name: rootdisk
               dataVolume:
@@ -63,6 +65,9 @@ spec:
                       opensuse:opensuse
                     expire: False
           networks:
+            - name: br0
+              multus:
+                networkName: kube-system/br0
             - name: default
               pod: {}
       dataVolumeTemplates:
