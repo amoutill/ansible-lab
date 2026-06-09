@@ -1,0 +1,20 @@
+rke2_bootstrap_node:
+  hosts:
+    opensuse-leap-0:
+      ansible_host: opensuse-leap-0.tortoise-goblin.ts.net
+
+rke2_server_nodes:
+  children:
+    rke2_bootstrap_node:
+  hosts:
+    opensuse-leap-1:
+      ansible_host: opensuse-leap-1.tortoise-goblin.ts.net
+    opensuse-leap-2:
+      ansible_host: opensuse-leap-2.tortoise-goblin.ts.net
+
+ansible_lab:
+  vars:
+    ansible_user: opensuse
+    ansible_python_interpreter: /usr/bin/python3
+  children:
+    rke2_server_nodes:
