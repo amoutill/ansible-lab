@@ -1,0 +1,9 @@
+- name: Update all lab nodes
+  hosts: ansible_lab
+
+  tasks:
+    - name: Update all packages
+      become: true
+      community.general.zypper:
+        name: "*"
+        state: latest
